@@ -33,7 +33,6 @@ public class UDPHandlerExecutorPool {
     asHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
         .setNamePrefix(ClientPacketHandler.getType()).build());
 
-
   }
 
 

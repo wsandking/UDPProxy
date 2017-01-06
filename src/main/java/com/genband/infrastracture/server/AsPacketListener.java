@@ -1,5 +1,7 @@
 package com.genband.infrastracture.server;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class AsPacketListener implements Runnable {
@@ -18,7 +20,17 @@ public class AsPacketListener implements Runnable {
   public void run() {
 
     while (true) {
+      
+      try {
+        
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        listener.receive(packet);
+        
+      } catch (IOException e) {
 
+        e.printStackTrace();
+      }
+      
     }
 
   }

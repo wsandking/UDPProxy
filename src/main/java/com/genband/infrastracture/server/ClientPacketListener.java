@@ -1,8 +1,11 @@
 package com.genband.infrastracture.server;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class ClientPacketListener implements Runnable {
+
   private DatagramSocket listener;
   private byte[] buffer;
 
@@ -18,7 +21,15 @@ public class ClientPacketListener implements Runnable {
 
     while (true) {
 
+      try {
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        listener.receive(packet);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
     }
+
   }
 
 }
