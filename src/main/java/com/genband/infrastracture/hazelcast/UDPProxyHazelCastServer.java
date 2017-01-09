@@ -10,6 +10,7 @@ import com.hazelcast.core.HazelcastInstance;
 
 public class UDPProxyHazelCastServer {
 
+  private static final String addressMapName = "userIpportMapping";
   private static UDPProxyHazelCastServer instance;
   private HazelcastInstance hazelcastInstance;
 
@@ -31,11 +32,17 @@ public class UDPProxyHazelCastServer {
 
   }
 
+  /**
+   * All these for customize storage
+   * 
+   * @param hashMap
+   * @return
+   */
   public <K, V> Map<K, V> getHashMap(String hashMap) {
 
     Map<K, V> value = hazelcastInstance.getMap(hashMap);
-
     return value;
+
   }
 
 
@@ -53,6 +60,34 @@ public class UDPProxyHazelCastServer {
 
     Map<K, V> value = hazelcastInstance.getMap(hashMap);
     value.put(key, val);
+
+  }
+
+  public void initAddressMap() {
+    hazelcastInstance.getMap(addressMapName);
+  }
+
+  public String getValueFromAddressMapByUsername(String username) {
+
+    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
+    String address = value.get(username);
+    return address;
+
+  }
+
+  public String getUsernameFromAddressMapByIp(String ip) {
+
+    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
+    String address = value.get(ip);
+    return address;
+
+  }
+
+  public void addUsernameAddressMap(String username, String adress) {
+
+    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
+    value.put(username, adress);
+    value.put(adress, username);
 
   }
 

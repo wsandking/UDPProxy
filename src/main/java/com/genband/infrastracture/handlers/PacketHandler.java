@@ -1,5 +1,7 @@
 package com.genband.infrastracture.handlers;
 
+import java.net.DatagramSocket;
+
 /**
  * 
  * Reverse
@@ -9,6 +11,6 @@ package com.genband.infrastracture.handlers;
  */
 public interface PacketHandler extends Runnable {
 
-  public void processPackets();
+  public void processPackets(DatagramSocket socket);
 
 }

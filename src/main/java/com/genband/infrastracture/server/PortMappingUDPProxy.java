@@ -18,6 +18,7 @@ import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
  */
 public class PortMappingUDPProxy {
 
+
   private DatagramSocket clientSideSocket;
   private DatagramSocket asSocket;
 
@@ -28,9 +29,9 @@ public class PortMappingUDPProxy {
   public PortMappingUDPProxy() {
 
     /**
-     * Initialize Hazelcast Server
+     * Initialize Hazelcast Server and initialMap
      */
-    UDPProxyHazelCastServer.getInstance();
+    UDPProxyHazelCastServer.getInstance().initAddressMap();
     this.configManager = ConfigurationManager.getInstance();
     clientSideUDPServerInit();
     asideUDPServerInit();
@@ -79,11 +80,12 @@ public class PortMappingUDPProxy {
    * Start two servers, listen on two different port
    */
   public void runServer() {
+    
     /**
      * Run two threads that listen on two different sockets
      */
     new Thread(new AsPacketListener(this.asSocket, this.configManager.getAsMTU())).start();
-    new Thread(new AsPacketListener(this.clientSideSocket, this.configManager.getClientMTU()))
+    new Thread(new ClientPacketListener(this.clientSideSocket, this.configManager.getClientMTU()))
         .start();
 
   }

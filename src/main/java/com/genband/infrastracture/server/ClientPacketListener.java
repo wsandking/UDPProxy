@@ -22,8 +22,13 @@ public class ClientPacketListener implements Runnable {
     while (true) {
 
       try {
+        
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         listener.receive(packet);
+        /**
+         * Send packets to Client handler
+         */
+        
       } catch (IOException e) {
         e.printStackTrace();
       }

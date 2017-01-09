@@ -1,5 +1,6 @@
 package com.genband.infrastracture.management;
 
+import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +36,12 @@ public class UDPHandlerExecutorPool {
 
   }
 
+  public void processClientPackets(DatagramSocket socket) {
 
+  }
+
+  public void processAsPackets(DatagramSocket socket) {
+
+  }
 
 }
