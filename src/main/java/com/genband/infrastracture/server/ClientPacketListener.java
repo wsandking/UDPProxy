@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+import com.genband.infrastracture.management.UDPHandlerExecutorPool;
+
 public class ClientPacketListener implements Runnable {
 
   private DatagramSocket listener;
@@ -22,13 +24,15 @@ public class ClientPacketListener implements Runnable {
     while (true) {
 
       try {
-        
+
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         listener.receive(packet);
         /**
          * Send packets to Client handler
          */
-        
+        System.out.println("Receive client packet, about to process it");
+        UDPHandlerExecutorPool.getInstance().processClientPackets(packet);
+
       } catch (IOException e) {
         e.printStackTrace();
       }

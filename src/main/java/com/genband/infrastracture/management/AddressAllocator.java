@@ -56,7 +56,8 @@ public class AddressAllocator {
       String[] ports = ConfigurationManager.getInstance().getPortRange().split("-");
       this.startPort = Integer.parseInt(ports[0]);
       this.maxPort = Integer.parseInt(ports[1]);
-      this.currentPortIndex = this.maxPort;
+      this.currentPortIndex = this.startPort;
+      this.ipIndex = 0;
 
     } catch (IndexOutOfBoundsException ex) {
       log.error(
@@ -84,7 +85,7 @@ public class AddressAllocator {
     // TODO Auto-generated method stub
 
     synchronized (this.currentPortIndex) {
-
+      
       if (this.currentPortIndex + 1 <= this.maxPort) {
         this.currentPortIndex++;
       } else if (this.ipIndex + 1 < this.avaiableIps.size()) {

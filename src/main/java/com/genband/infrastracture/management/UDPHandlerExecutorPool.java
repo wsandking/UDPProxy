@@ -1,5 +1,6 @@
 package com.genband.infrastracture.management;
 
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,17 +31,21 @@ public class UDPHandlerExecutorPool {
   private UDPHandlerExecutorPool() {
 
     clientHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
-        .setNamePrefix(AsPacketHandler.getType()).build());
-    asHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
         .setNamePrefix(ClientPacketHandler.getType()).build());
+    asHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
+        .setNamePrefix(AsPacketHandler.getType()).build());
 
   }
 
-  public void processClientPackets(DatagramSocket socket) {
+  public void processClientPackets(DatagramPacket packet) {
+
+    clientHandlersPool.execute(new ClientPacketHandler().processPackets(packet));
 
   }
 
-  public void processAsPackets(DatagramSocket socket) {
+  public void processAsPackets(DatagramPacket packet) {
+
+    asHandlersPool.execute(new AsPacketHandler().processPackets(packet));
 
   }
 

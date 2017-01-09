@@ -49,6 +49,8 @@ public class PortMappingUDPProxy {
     for (String ip : ips) {
       try {
         clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
+        System.out.println("Client listen ip: " + ip);
+        System.out.println("Client listen port: " + port);
       } catch (SocketException e) {
         log.error("Cannot initiate UDP listenning. ");
       } catch (UnknownHostException e) {
@@ -67,7 +69,7 @@ public class PortMappingUDPProxy {
      * May have multiple IP address to listen
      */
     try {
-      clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
+      asSocket = new DatagramSocket(port, InetAddress.getByName(ip));
     } catch (SocketException e) {
       log.error("Cannot initiate UDP listenning. ");
     } catch (UnknownHostException e) {
@@ -80,7 +82,7 @@ public class PortMappingUDPProxy {
    * Start two servers, listen on two different port
    */
   public void runServer() {
-    
+
     /**
      * Run two threads that listen on two different sockets
      */

@@ -22,7 +22,7 @@ public class UDPSimulateSender {
    */
   public UDPSimulateSender() throws UnknownHostException {
     try {
-      socket = new DatagramSocket(5090);
+      socket = new DatagramSocket(5096);
       // senderSocket = new DatagramSocket(5092, InetAddress.getByName("192.168.56.1"));
     } catch (SocketException ex) {
       ex.printStackTrace();

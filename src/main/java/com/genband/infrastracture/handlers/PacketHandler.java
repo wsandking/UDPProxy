@@ -1,6 +1,7 @@
 package com.genband.infrastracture.handlers;
 
-import java.net.DatagramSocket;
+import java.net.DatagramPacket;
+
 
 /**
  * 
@@ -11,6 +12,6 @@ import java.net.DatagramSocket;
  */
 public interface PacketHandler extends Runnable {
 
-  public void processPackets(DatagramSocket socket);
+  public PacketHandler processPackets(DatagramPacket packet);
 
 }
