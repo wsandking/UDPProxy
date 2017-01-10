@@ -29,6 +29,9 @@ public class ConfigurationManager {
   private String asServerAddress;
   private String assignableIpAddresses;
   private String portRange;
+  private String appstierAddresses;
+  private int appstierPort;
+
   private int clientSidePort;
   private String clientSideIP;
   private int asListenPort;
@@ -82,6 +85,8 @@ public class ConfigurationManager {
     this.asListenPort = Integer.parseInt(this.getPropertyValueByName("AS_LISTEN_PORT"));
     this.asMTU = Integer.parseInt(this.getPropertyValueByName("AS_MTU"));
     this.clientMTU = Integer.parseInt(this.getPropertyValueByName("CLIENT_MTU"));
+    this.appstierAddresses = this.getPropertyValueByName("APPSTIER_IP_ADDRESSES");
+    this.appstierPort = Integer.parseInt(this.getPropertyValueByName("APPSTIER_PORT"));
 
   }
 
@@ -138,5 +143,12 @@ public class ConfigurationManager {
     return asMTU;
   }
 
+  public String getAppstierAddresses() {
+    return appstierAddresses;
+  }
+
+  public int getAppstierPort() {
+    return appstierPort;
+  }
 
 }

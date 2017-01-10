@@ -1,7 +1,14 @@
 package com.genband.infrastracture.management;
 
-public class Address {
+import java.io.Serializable;
 
+public class Address implements Serializable{
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -712726298012254453L;
+  
   private String ipAddress;
   private int port;
 

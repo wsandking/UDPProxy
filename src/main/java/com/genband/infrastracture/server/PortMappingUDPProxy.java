@@ -86,7 +86,9 @@ public class PortMappingUDPProxy {
     /**
      * Run two threads that listen on two different sockets
      */
-    new Thread(new AsPacketListener(this.asSocket, this.configManager.getAsMTU())).start();
+    new Thread(
+        new AsPacketListener(this.asSocket, this.clientSideSocket, this.configManager.getAsMTU()))
+            .start();
     new Thread(new ClientPacketListener(this.clientSideSocket, this.configManager.getClientMTU()))
         .start();
 

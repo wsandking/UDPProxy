@@ -30,6 +30,9 @@ public class ClientPacketHandler implements PacketHandler {
   private static Integer asServerPort;
   private static Pattern p;
 
+  private static DatagramSocket testSocket;
+
+
   static {
     asServerAddress = ConfigurationManager.getInstance().getAsServerAddress();
     asServerPort = ConfigurationManager.getInstance().getAsServerPort();
@@ -52,6 +55,7 @@ public class ClientPacketHandler implements PacketHandler {
      * At this moment open an port and listen
      */
     try {
+      
       String content = new String(packet.getData(), 0, packet.getLength());
       Matcher m = p.matcher(content);
       String username = null;
@@ -59,11 +63,17 @@ public class ClientPacketHandler implements PacketHandler {
         // we're only looking for one group, so get it
         username = m.group(1) + "@" + m.group(2);
         System.out.println("Username: " + username);
-        if (null == this.getUserContactInfo(username)) {
-          this.processPacketsForNewUser(username);
-        }
-      }
 
+        Address ads = this.getUserContactInfo(username);
+        if (null == ads) {
+          ads = AddressAllocator.getInstance().getAvailableAddress();
+          this.saveContactInfo(username, ads);
+        }
+
+        DatagramPacket dp = this.constructPackets(ads);
+        this.sendPackets(dp, ads);
+
+      }
 
     } catch (AddressException e) {
       // TODO Auto-generated catch block
@@ -75,27 +85,47 @@ public class ClientPacketHandler implements PacketHandler {
 
   }
 
-  private String getUserContactInfo(String username) {
+  private Address getUserContactInfo(String username) {
 
-    String address = null;
+    Address address = null;
     if (null != UDPProxyHazelCastServer.getInstance().getValueFromAddressMapByUsername(username))
       address = UDPProxyHazelCastServer.getInstance().getValueFromAddressMapByUsername(username);
     return address;
 
   }
 
+  /**
+   * If create socket too costly, probably just re-use some
+   * 
+   * @param udppack
+   * @param ad
+   * @throws IOException
+   */
   private void sendPackets(DatagramPacket udppack, Address ad) throws IOException {
     // TODO Auto-generated method stub
     udppack.setAddress(InetAddress.getByName(asServerAddress));
     udppack.setPort(asServerPort);
 
-    DatagramSocket ds = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
-    ds.send(udppack);
+    System.out.println("About to send out message");
+    
+    if (testSocket == null){
+      
+      System.out.println("Initialize sockets");
+      testSocket = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
+      
+    }
+    testSocket.send(udppack);
 
+    // DatagramSocket ds = new DatagramSocket(ad.getPort(),
+    // InetAddress.getByName(ad.getIpAddress()));
+    // ds.send(udppack);
+
+    // ds.close();
     /**
      * For testing on purpose on windows, open a socket re-route it to our listening port
      */
-    testReceivePacket(ds);
+    // testReceivePacket(ds);
+    testReceivePacket(testSocket);
   }
 
   private void testReceivePacket(DatagramSocket ds) {
@@ -107,7 +137,10 @@ public class ClientPacketHandler implements PacketHandler {
       ds.receive(pac);
 
       pac.setPort(packet.getPort());
+      System.out.print(packet.getPort());
+
       pac.setAddress(packet.getAddress());
+      System.out.print(packet.getAddress());
 
       ds.send(pac);
 
@@ -116,36 +149,29 @@ public class ClientPacketHandler implements PacketHandler {
       e.printStackTrace();
     }
 
-
-
   }
 
   /**
    * To fix
+   * 
    * @param username
    * @throws AddressException
    * @throws IOException
    */
-  private void processPacketsForNewUser(String username) throws AddressException, IOException {
+  private DatagramPacket constructPackets(Address ad) throws AddressException, IOException {
 
-    Address ad = AddressAllocator.getInstance().getAvailableAddress();
     String content = new String(packet.getData(), 0, packet.getLength());
-
     String address = ad.getIpAddress() + ":" + ad.getPort();
-
     String newStr = content.replaceAll(UDP_CONTACT, "Contact: <sip:$1@" + address);
 
     byte[] newContent = newStr.getBytes();
     DatagramPacket udppack = new DatagramPacket(newContent, newContent.length);
 
-    if (null != username && null != address) {
-      this.saveContactInfo(username, address);
-      this.sendPackets(udppack, ad);
-    }
+    return udppack;
 
   }
 
-  private void saveContactInfo(String username, String address) {
+  private void saveContactInfo(String username, Address address) {
     UDPProxyHazelCastServer.getInstance().addUsernameAddressMap(username, address);
   }
 

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.genband.infrastracture.management.Address;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -67,28 +68,31 @@ public class UDPProxyHazelCastServer {
     hazelcastInstance.getMap(addressMapName);
   }
 
-  public String getValueFromAddressMapByUsername(String username) {
+  public Address getValueFromAddressMapByUsername(String username) {
 
-    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
-    String address = value.get(username);
+    Map<String, Address> value = hazelcastInstance.getMap(addressMapName);
+    Address address = value.get(username);
     return address;
 
   }
 
-  public String getUsernameFromAddressMapByIp(String ip) {
+  // public Address getUsernameFromAddressMapByIp(String ip) {
+  //
+  // Map<String, Address> value = hazelcastInstance.getMap(addressMapName);
+  // Address address = value.get(ip);
+  // return address;
+  //
+  // }
 
-    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
-    String address = value.get(ip);
-    return address;
+  public void addUsernameAddressMap(String username, Address adress) {
 
-  }
-
-  public void addUsernameAddressMap(String username, String adress) {
-
-    Map<String, String> value = hazelcastInstance.getMap(addressMapName);
+    Map<String, Address> value = hazelcastInstance.getMap(addressMapName);
     value.put(username, adress);
-    value.put(adress, username);
 
+    /**
+     * Probably donot need another side operation, just making packets
+     */
+    // value.put(adress, username);
   }
 
 }
