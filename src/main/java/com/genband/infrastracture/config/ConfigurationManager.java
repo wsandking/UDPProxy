@@ -36,8 +36,8 @@ public class ConfigurationManager {
   private String clientSideIP;
   private int asListenPort;
   private String asListenAddress;
-  private int clientMTU;
-  private int asMTU;
+  private int clientBufferSize;
+  private int asBufferSize;
 
   private int asServerPort;
 
@@ -83,8 +83,8 @@ public class ConfigurationManager {
     this.clientSideIP = this.getPropertyValueByName("CLIENT_SIDE_IP_ADDRESSES");
     this.asListenAddress = this.getPropertyValueByName("AS_LISTEN_ADDRESS");
     this.asListenPort = Integer.parseInt(this.getPropertyValueByName("AS_LISTEN_PORT"));
-    this.asMTU = Integer.parseInt(this.getPropertyValueByName("AS_MTU"));
-    this.clientMTU = Integer.parseInt(this.getPropertyValueByName("CLIENT_MTU"));
+    this.asBufferSize = Integer.parseInt(this.getPropertyValueByName("AS_BUFFER_SIZE"));
+    this.clientBufferSize = Integer.parseInt(this.getPropertyValueByName("CLIENT_BUFFER_SIZE"));
     this.appstierAddresses = this.getPropertyValueByName("APPSTIER_IP_ADDRESSES");
     this.appstierPort = Integer.parseInt(this.getPropertyValueByName("APPSTIER_PORT"));
 
@@ -135,12 +135,12 @@ public class ConfigurationManager {
     return asListenAddress;
   }
 
-  public int getClientMTU() {
-    return clientMTU;
+  public int getClientBufferSize() {
+    return clientBufferSize;
   }
 
-  public int getAsMTU() {
-    return asMTU;
+  public int getAsBufferSize() {
+    return asBufferSize;
   }
 
   public String getAppstierAddresses() {

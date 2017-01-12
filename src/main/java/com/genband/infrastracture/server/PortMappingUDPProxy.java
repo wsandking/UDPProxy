@@ -22,6 +22,8 @@ public class PortMappingUDPProxy {
   private DatagramSocket clientSideSocket;
   private DatagramSocket asSocket;
 
+  private Integer debugListener;
+
   private ConfigurationManager configManager;
 
   private static Logger log = Logger.getLogger(PortMappingUDPProxy.class.getName());
@@ -48,13 +50,14 @@ public class PortMappingUDPProxy {
      */
     for (String ip : ips) {
       try {
+
+        log.info("Appstier listen ip: " + ip + " listen port: " + port);
         clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
-        System.out.println("Client listen ip: " + ip);
-        System.out.println("Client listen port: " + port);
+
       } catch (SocketException e) {
-        log.error("Cannot initiate UDP listenning. ");
+        log.error("Cannot initiate UDP listenning. " + e.getMessage());
       } catch (UnknownHostException e) {
-        log.error("Cannot listen on ip: " + ip);
+        log.error("Cannot listen on ip: " + ip + " reason: " + e.getMessage());
       }
     }
 
@@ -69,7 +72,10 @@ public class PortMappingUDPProxy {
      * May have multiple IP address to listen
      */
     try {
+
+      log.info("AS listen ip: " + ip + " listen port: " + port);
       asSocket = new DatagramSocket(port, InetAddress.getByName(ip));
+
     } catch (SocketException e) {
       log.error("Cannot initiate UDP listenning. ");
     } catch (UnknownHostException e) {
@@ -86,11 +92,15 @@ public class PortMappingUDPProxy {
     /**
      * Run two threads that listen on two different sockets
      */
+    new Thread(new AsPacketListener(this.asSocket, this.clientSideSocket,
+        this.configManager.getAsBufferSize())).start();
     new Thread(
-        new AsPacketListener(this.asSocket, this.clientSideSocket, this.configManager.getAsMTU()))
+        new ClientPacketListener(this.clientSideSocket, this.configManager.getClientBufferSize()))
             .start();
-    new Thread(new ClientPacketListener(this.clientSideSocket, this.configManager.getClientMTU()))
-        .start();
+
+    if (null != debugListener) {
+      log.info("Debug mode. Initialize debug Listener. ");
+    }
 
   }
 
@@ -98,6 +108,8 @@ public class PortMappingUDPProxy {
 
     BasicConfigurator.configure();
     PortMappingUDPProxy pmUDPProxy = new PortMappingUDPProxy();
+    if (args.length > 1)
+      pmUDPProxy.debugListener = 10;
     pmUDPProxy.runServer();
 
   }

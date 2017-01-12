@@ -30,8 +30,12 @@ public class ClientPacketHandler implements PacketHandler {
   private static Integer asServerPort;
   private static Pattern p;
 
+  /**
+   * Should both be removed
+   */
   private static DatagramSocket testSocket;
-
+  private static DatagramSocket testAnotherSocket;
+  private static boolean openListener = false;
 
   static {
     asServerAddress = ConfigurationManager.getInstance().getAsServerAddress();
@@ -55,14 +59,13 @@ public class ClientPacketHandler implements PacketHandler {
      * At this moment open an port and listen
      */
     try {
-      
+
       String content = new String(packet.getData(), 0, packet.getLength());
       Matcher m = p.matcher(content);
       String username = null;
       if (m.find()) {
         // we're only looking for one group, so get it
         username = m.group(1) + "@" + m.group(2);
-        System.out.println("Username: " + username);
 
         Address ads = this.getUserContactInfo(username);
         if (null == ads) {
@@ -106,44 +109,55 @@ public class ClientPacketHandler implements PacketHandler {
     udppack.setAddress(InetAddress.getByName(asServerAddress));
     udppack.setPort(asServerPort);
 
-    System.out.println("About to send out message");
-    
-    if (testSocket == null){
-      
-      System.out.println("Initialize sockets");
-      testSocket = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
-      
-    }
-    testSocket.send(udppack);
-
+    /**
+     * The actually working code
+     */
     // DatagramSocket ds = new DatagramSocket(ad.getPort(),
     // InetAddress.getByName(ad.getIpAddress()));
     // ds.send(udppack);
-
+    // log.info("Message send to AS server - address: " + udppack.getAddress() + " port: "
+    // + udppack.getPort());
     // ds.close();
+
+    if (testSocket == null) {
+
+      testSocket = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
+
+    }
+
+    testSocket.send(udppack);
+    log.info(
+        "Test socket sent packets to " + udppack.getAddress().toString() + ":" + udppack.getPort());
+
     /**
      * For testing on purpose on windows, open a socket re-route it to our listening port
      */
-    // testReceivePacket(ds);
-    testReceivePacket(testSocket);
+    if (openListener == false)
+      testReceivePacket(testSocket);
+
   }
 
   private void testReceivePacket(DatagramSocket ds) {
     // TODO Auto-generated method stub
 
     try {
-      byte buffer[] = new byte[1450];
-      DatagramPacket pac = new DatagramPacket(buffer, buffer.length);
-      ds.receive(pac);
+      while (true) {
+        byte buffer[] = new byte[3000];
+        DatagramPacket pac = new DatagramPacket(buffer, buffer.length);
+        ds.receive(pac);
+        log.info("Receive message from test socket listenning part... ");
+        pac.setPort(packet.getPort());
+        pac.setAddress(packet.getAddress());
 
-      pac.setPort(packet.getPort());
-      System.out.print(packet.getPort());
-
-      pac.setAddress(packet.getAddress());
-      System.out.print(packet.getAddress());
-
-      ds.send(pac);
-
+        /**
+         * Fragmentation
+         */
+        
+        
+        testAnotherSocket.send(pac);
+        log.info("Message send back to apps tier - address: " + packet.getAddress() + " port: "
+            + packet.getPort());
+      }
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -175,9 +189,22 @@ public class ClientPacketHandler implements PacketHandler {
     UDPProxyHazelCastServer.getInstance().addUsernameAddressMap(username, address);
   }
 
+
+
   public static String getType() {
     // TODO Auto-generated method stub
     return HANDLER_TYPE;
+  }
+
+  /**
+   * Test function, should be removed
+   */
+  public static DatagramSocket getTestAnotherSocket() {
+    return testAnotherSocket;
+  }
+
+  public static void setTestAnotherSocket(DatagramSocket testAnotherSocket) {
+    ClientPacketHandler.testAnotherSocket = testAnotherSocket;
   }
 
 }

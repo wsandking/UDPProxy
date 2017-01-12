@@ -66,8 +66,8 @@ public class AsPacketHandler implements PacketHandler {
       if (appstierAddresses.length > 1 && index < appstierAddresses.length && index >= 0) {
 
         synchronized (index) {
-          desIp = appstierAddresses[index];
 
+          desIp = appstierAddresses[index];
           if (++index >= appstierAddresses.length)
             index = 0;
 
@@ -75,6 +75,7 @@ public class AsPacketHandler implements PacketHandler {
 
       } else
         desIp = appstierAddresses[0];
+
       DatagramPacket dp = this.constructPacket(address);
       this.sendPacket(dp, desIp);
 
@@ -89,6 +90,19 @@ public class AsPacketHandler implements PacketHandler {
     // TODO Auto-generated method stub
     dp.setAddress(InetAddress.getByName(destinationIp));
     dp.setPort(appstierPort);
+
+    /**
+     * 
+     */
+    log.info("Send message back to apps tier. " + " Address: " + destinationIp + ":" + appstierPort
+        + " From Socket " + clientSideSocket.getLocalAddress().toString() + ":"
+        + clientSideSocket.getPort());
+
+    /***
+     * For debug purpose print out the information
+     */
+    String contents = new String(dp.getData(), 0, dp.getLength());
+    log.info("Contents: \n\n" + contents);
 
     clientSideSocket.send(dp);
 
@@ -109,5 +123,15 @@ public class AsPacketHandler implements PacketHandler {
     // TODO Auto-generated method stub
     return HANDLER_TYPE;
   }
+
+  public static Integer getAppstierPort() {
+    return appstierPort;
+  }
+
+  public static void setAppstierPort(Integer appstierPort) {
+    AsPacketHandler.appstierPort = appstierPort;
+  }
+
+
 
 }
