@@ -1,6 +1,7 @@
 package com.genband.infrastracture.management;
 
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +19,7 @@ public class UDPHandlerExecutorPool {
   private static UDPHandlerExecutorPool instance;
   private ExecutorService clientHandlersPool;
   private ExecutorService asHandlersPool;
+  private ExecutorService tmpSocketListenPool;
 
   public static UDPHandlerExecutorPool getInstance() {
 
@@ -38,13 +40,25 @@ public class UDPHandlerExecutorPool {
 
   public void processClientPackets(DatagramPacket packet) {
 
-    clientHandlersPool.execute(new ClientPacketHandler().processPackets(packet));
+    /**
+     * May use execute, need to investigate
+     */
+    clientHandlersPool.submit(new ClientPacketHandler().processPackets(packet));
 
   }
 
   public void processAsPackets(DatagramPacket packet) {
 
-    asHandlersPool.execute(new AsPacketHandler().processPackets(packet));
+    /**
+     * May use execute, need to investigate
+     */
+    asHandlersPool.submit(new AsPacketHandler().processPackets(packet));
+
+  }
+
+  public void setupTempSocketListener(DatagramSocket socket) {
+    
+    
 
   }
 

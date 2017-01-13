@@ -1,4 +1,4 @@
-package com.genband.infrastracture.server;
+package com.genband.infrastracture.listener;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import org.apache.log4j.Logger;
 
 import com.genband.infrastracture.handlers.AsPacketHandler;
+import com.genband.infrastracture.handlers.TmpSocketHandler;
 import com.genband.infrastracture.management.UDPHandlerExecutorPool;
 
 public class ClientPacketListener implements Runnable {
@@ -43,6 +44,7 @@ public class ClientPacketListener implements Runnable {
 
           log.info("Update appstier port.");
           AsPacketHandler.setAppstierPort(packet.getPort());
+          TmpSocketHandler.setAppstierPort(packet.getPort());
 
         }
 

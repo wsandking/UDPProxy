@@ -13,11 +13,11 @@ public class AsPacketHandler implements PacketHandler {
   private static Logger log = Logger.getLogger(AsPacketHandler.class.getName());
   private static final String HANDLER_TYPE = "AS Application Handler";
   private static final String UDP_CONTACT =
-      "Contact: <sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
+      "Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
 
+  private static String proxyAddress;
   private static String[] appstierAddresses;
-  private static String clientSideIP;
-  private static Integer clientSidePort;
+
   private static Integer appstierPort;
   private static Integer index;
   private static DatagramSocket clientSideSocket;
@@ -26,8 +26,8 @@ public class AsPacketHandler implements PacketHandler {
 
     appstierAddresses = ConfigurationManager.getInstance().getAppstierAddresses().split(";");
     appstierPort = ConfigurationManager.getInstance().getAsListenPort();
-    clientSideIP = ConfigurationManager.getInstance().getClientSideIP();
-    clientSidePort = ConfigurationManager.getInstance().getClientSidePort();
+    proxyAddress = ConfigurationManager.getInstance().getClientSideIP() + ":"
+        + ConfigurationManager.getInstance().getClientSidePort();
     index = 0;
 
   }
@@ -60,7 +60,6 @@ public class AsPacketHandler implements PacketHandler {
       /**
        * Future may have multiple ip on apps-tier side
        */
-      String address = clientSideIP + ":" + clientSidePort;
       String desIp = null;
 
       if (appstierAddresses.length > 1 && index < appstierAddresses.length && index >= 0) {
@@ -76,7 +75,7 @@ public class AsPacketHandler implements PacketHandler {
       } else
         desIp = appstierAddresses[0];
 
-      DatagramPacket dp = this.constructPacket(address);
+      DatagramPacket dp = this.constructPacket();
       this.sendPacket(dp, desIp);
 
     } catch (IOException e) {
@@ -108,10 +107,10 @@ public class AsPacketHandler implements PacketHandler {
 
   }
 
-  private DatagramPacket constructPacket(String address) {
-    // TODO Auto-generated method stub
+  private DatagramPacket constructPacket() {
+
     String content = new String(packet.getData(), 0, packet.getLength());
-    String newStr = content.replaceAll(UDP_CONTACT, "Contact: <sip:$1@" + address);
+    String newStr = content.replaceAll(UDP_CONTACT, "Contact: <sip:$1@" + proxyAddress);
 
     byte[] newContent = newStr.getBytes();
     DatagramPacket udppack = new DatagramPacket(newContent, newContent.length);
@@ -131,7 +130,5 @@ public class AsPacketHandler implements PacketHandler {
   public static void setAppstierPort(Integer appstierPort) {
     AsPacketHandler.appstierPort = appstierPort;
   }
-
-
 
 }
