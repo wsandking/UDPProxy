@@ -112,6 +112,7 @@ public class UDPSimulateSender {
 //    UDPSimulateSender sender = new UDPSimulateSender();
 //
     String str = String.join("\n", "REGISTER sip:sidr.dev.genband.com SIP/2.0",
+        "SIP/2.0 200 OK",
         "Via: SIP/2.0/UDP 172.28.19.60:5090;branch=z9hG4bK-524287-1---b3b3e77b860f4d13;rport",
         "Max-Forwards: 70",
         "Contact: \"testagent02\"<sip:testagent01@172.28.19.60:5090;rinstance=94b99f6f8d82633e>",
@@ -128,6 +129,7 @@ public class UDPSimulateSender {
         "Contact: <sip:$1@" + address);
 
     System.out.println(newStr);
+    System.out.println(newStr.contains("SIP/2.0 200 OK"));
 //    sender.receivePacket();
 //    String a = "T";
 //    System.out.println(a.getBytes().length);

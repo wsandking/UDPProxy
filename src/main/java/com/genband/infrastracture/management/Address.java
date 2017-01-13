@@ -2,13 +2,13 @@ package com.genband.infrastracture.management;
 
 import java.io.Serializable;
 
-public class Address implements Serializable{
+public class Address implements Serializable {
 
   /**
    * 
    */
   private static final long serialVersionUID = -712726298012254453L;
-  
+
   private String ipAddress;
   private int port;
 
@@ -27,6 +27,10 @@ public class Address implements Serializable{
   public void setPort(int port) {
     this.port = port;
   }
-  
-  
+
+  @Override
+  public String toString() {
+    return "Address [ipAddress=" + ipAddress + ", port=" + port + "]";
+  }
+
 }

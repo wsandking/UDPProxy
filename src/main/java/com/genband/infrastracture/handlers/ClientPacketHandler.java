@@ -18,11 +18,13 @@ import com.genband.infrastracture.exception.AddressException;
 import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
 import com.genband.infrastracture.management.Address;
 import com.genband.infrastracture.management.AddressAllocator;
+import com.genband.infrastracture.management.UDPExecutorPool;
 
 
 public class ClientPacketHandler implements PacketHandler {
 
   private static final String HANDLER_TYPE = "Client Packet Handler";
+  private static final String OK_STATUS_FOR_LOGIN = "SIP/2.0 200 OK";
   private static final String UDP_USER_FROM =
       "From: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
   private static final String UDP_CONTACT =
@@ -80,6 +82,7 @@ public class ClientPacketHandler implements PacketHandler {
       String content = new String(packet.getData(), 0, packet.getLength());
       Matcher m = p.matcher(content);
       String username = null;
+
       if (m.find()) {
         // we're only looking for one group, so get it
         username = m.group(1) + "@" + m.group(2);
@@ -92,8 +95,22 @@ public class ClientPacketHandler implements PacketHandler {
 
         }
 
-        DatagramPacket dp = this.constructPackets(ads);
-        this.sendPackets(dp, ads);
+        log.info(String.format("Username: %s, Address: %s", username, ads.toString()));
+
+        DatagramPacket dp = this.constructPackets(ads, content);
+        DatagramSocket ds = this.getSocket(ads);
+        this.sendPackets(ds, dp, ads);
+
+        if (this.checkIfItShouldbeClosed(content)) {
+
+          log.info("Tempo socket should be closed.");
+          synchronized (socketPool) {
+            socketPool.remove(ads);
+          }
+
+          ds.close();
+
+        }
 
       } else {
 
@@ -113,6 +130,18 @@ public class ClientPacketHandler implements PacketHandler {
 
   }
 
+  private boolean checkIfItShouldbeClosed(String content) {
+    // TODO Auto-generated method stub
+    boolean result = false;
+
+    if (content.contains(OK_STATUS_FOR_LOGIN))
+      log.info(
+          "******************Login successful, Socket should be close ************************");
+
+    return result;
+
+  }
+
   private Address getUserContactInfo(String username) {
 
     Address address = null;
@@ -126,11 +155,14 @@ public class ClientPacketHandler implements PacketHandler {
   /**
    * If create socket too costly, probably just re-use some
    * 
+   * @param ds
+   * 
    * @param udppack
    * @param ad
    * @throws IOException
    */
-  private void sendPackets(DatagramPacket udppack, Address ad) throws IOException {
+  private void sendPackets(DatagramSocket ds, DatagramPacket udppack, Address ad)
+      throws IOException {
     // TODO Auto-generated method stub
     udppack.setAddress(InetAddress.getByName(asServerAddress));
     udppack.setPort(asServerPort);
@@ -138,15 +170,15 @@ public class ClientPacketHandler implements PacketHandler {
     /**
      * The actually working code
      */
-    DatagramSocket ds = this.getSocket(ad);
     ds.send(udppack);
     log.info("Message send to AS server - address: " + udppack.getAddress() + " port: "
         + udppack.getPort());
 
+    UDPExecutorPool.getInstance().setupTempSocketListener(ds);
     /**
      * Put socket in temporarily
      */
-    ds.close();
+    // ds.close();
 
     // if (testSocket == null) {
     //
@@ -168,15 +200,20 @@ public class ClientPacketHandler implements PacketHandler {
 
   private DatagramSocket getSocket(Address ad) throws SocketException, UnknownHostException {
     // TODO Auto-generated method stub
-    DatagramSocket ds = null;
-    if (null == socketPool.get(ad)) {
+    DatagramSocket ds = socketPool.get(ad);
+    synchronized (socketPool) {
 
-      ds = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
-      socketPool.put(ad, ds);
+      if (null == ds) {
 
-    } else {
+        ds = new DatagramSocket(ad.getPort(), InetAddress.getByName(ad.getIpAddress()));
+        socketPool.put(ad, ds);
+        log.info("Create a new Socket and put it Socket_Pool");
 
-      ds = socketPool.get(ad);
+      } else {
+
+        log.info("Retrieve Socket From Socket Pool");
+
+      }
 
     }
 
@@ -216,9 +253,9 @@ public class ClientPacketHandler implements PacketHandler {
    * @throws AddressException
    * @throws IOException
    */
-  private DatagramPacket constructPackets(Address ad) throws AddressException, IOException {
+  private DatagramPacket constructPackets(Address ad, String content)
+      throws AddressException, IOException {
 
-    String content = new String(packet.getData(), 0, packet.getLength());
     String address = ad.getIpAddress() + ":" + ad.getPort();
     String newStr = content.replaceAll(UDP_CONTACT, "Contact: <sip:$1@" + address);
 
@@ -230,7 +267,9 @@ public class ClientPacketHandler implements PacketHandler {
   }
 
   private void saveContactInfo(String username, Address address) {
+
     UDPProxyHazelCastServer.getInstance().addUsernameAddressMap(username, address);
+
   }
 
 

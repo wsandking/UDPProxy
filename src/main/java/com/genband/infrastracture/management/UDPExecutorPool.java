@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import com.genband.infrastracture.handlers.AsPacketHandler;
 import com.genband.infrastracture.handlers.ClientPacketHandler;
+import com.genband.infrastracture.handlers.TmpSocketHandler;
 
 /**
  * Manage the threads that handles incoming packets
@@ -14,27 +15,29 @@ import com.genband.infrastracture.handlers.ClientPacketHandler;
  * @author sewang
  *
  */
-public class UDPHandlerExecutorPool {
+public class UDPExecutorPool {
 
-  private static UDPHandlerExecutorPool instance;
+  private static UDPExecutorPool instance;
   private ExecutorService clientHandlersPool;
   private ExecutorService asHandlersPool;
   private ExecutorService tmpSocketListenPool;
 
-  public static UDPHandlerExecutorPool getInstance() {
+  public static UDPExecutorPool getInstance() {
 
     if (null == instance)
-      instance = new UDPHandlerExecutorPool();
+      instance = new UDPExecutorPool();
     return instance;
 
   }
 
-  private UDPHandlerExecutorPool() {
+  private UDPExecutorPool() {
 
     clientHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
         .setNamePrefix(ClientPacketHandler.getType()).build());
     asHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
         .setNamePrefix(AsPacketHandler.getType()).build());
+    tmpSocketListenPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
+        .setNamePrefix(TmpSocketHandler.getType()).build());
 
   }
 
@@ -57,8 +60,8 @@ public class UDPHandlerExecutorPool {
   }
 
   public void setupTempSocketListener(DatagramSocket socket) {
-    
-    
+
+    tmpSocketListenPool.submit(new TmpSocketHandler().setListenSocket(socket));
 
   }
 

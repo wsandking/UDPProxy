@@ -10,6 +10,7 @@ import com.genband.infrastracture.config.ConfigurationManager;
 
 public class TmpSocketHandler implements Runnable {
 
+  private static final String HANDLER_TYPE = "TEMPO_SOCKET_HANDLER";
   private static final String UDP_CONTACT =
       "Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
 
@@ -48,16 +49,19 @@ public class TmpSocketHandler implements Runnable {
   }
 
   public static void setAppsTierSocket(DatagramSocket appsTierSocket) {
-    
+
     TmpSocketHandler.appsTierSocket = appsTierSocket;
-    
+
   }
 
   @Override
   public void run() {
     // TODO Auto-generated method stub
     try {
-      while (true) {
+      /**
+       * As long as socket is not close, keep listening
+       */
+      while (!listenSocket.isClosed()) {
 
         DatagramPacket pac = new DatagramPacket(buffer, buffer.length);
         listenSocket.receive(pac);
@@ -86,6 +90,8 @@ public class TmpSocketHandler implements Runnable {
             + pac.getPort());
 
       }
+
+      log.info("Socket is closed, finish this job ******************* ");
     } catch (IOException e) {
 
       log.error("Message cannot send back to apps tier ");
@@ -94,9 +100,9 @@ public class TmpSocketHandler implements Runnable {
   }
 
   public static void setAppstierPort(Integer appstierPort) {
-    
+
     TmpSocketHandler.appstierPort = appstierPort;
-  
+
   }
 
   private DatagramPacket constructPacket(DatagramPacket packet) {
@@ -110,4 +116,8 @@ public class TmpSocketHandler implements Runnable {
 
   }
 
+  public static String getType() {
+    // TODO Auto-generated method stub
+    return HANDLER_TYPE;
+  }
 }

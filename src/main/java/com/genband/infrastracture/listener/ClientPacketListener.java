@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.genband.infrastracture.handlers.AsPacketHandler;
 import com.genband.infrastracture.handlers.TmpSocketHandler;
-import com.genband.infrastracture.management.UDPHandlerExecutorPool;
+import com.genband.infrastracture.management.UDPExecutorPool;
 
 public class ClientPacketListener implements Runnable {
 
@@ -51,7 +51,7 @@ public class ClientPacketListener implements Runnable {
         /**
          * Send packets to Client handler
          */
-        UDPHandlerExecutorPool.getInstance().processClientPackets(packet);
+        UDPExecutorPool.getInstance().processClientPackets(packet);
 
       } catch (IOException e) {
         e.printStackTrace();

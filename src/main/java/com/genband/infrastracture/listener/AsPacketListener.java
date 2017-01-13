@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.genband.infrastracture.handlers.AsPacketHandler;
 import com.genband.infrastracture.handlers.TmpSocketHandler;
-import com.genband.infrastracture.management.UDPHandlerExecutorPool;
+import com.genband.infrastracture.management.UDPExecutorPool;
 
 public class AsPacketListener implements Runnable {
 
@@ -40,7 +40,7 @@ public class AsPacketListener implements Runnable {
         log.info(String.format("receive packets from AS: %s:%s", packet.getAddress().toString(),
             packet.getPort()));
 
-        UDPHandlerExecutorPool.getInstance().processAsPackets(packet);
+        UDPExecutorPool.getInstance().processAsPackets(packet);
 
       } catch (IOException e) {
 
