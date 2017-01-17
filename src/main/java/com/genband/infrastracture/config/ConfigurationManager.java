@@ -22,24 +22,26 @@ public class ConfigurationManager {
   private final static String DEFAULT_CONFIG_LOCATION = "udp_proxy.properties";
 
   private static Logger log = Logger.getLogger(ConfigurationManager.class.getName());
-
   private static ConfigurationManager instance;
+
   private Properties prop;
 
   private String asServerAddress;
   private String assignableIpAddresses;
   private String portRange;
   private String appstierAddresses;
-  private int appstierPort;
-
-  private int clientSidePort;
   private String clientSideIP;
-  private int asListenPort;
   private String asListenAddress;
+  private String hazelCastIp;
+
+  private int hazelCastPort;
+  private int appstierPort;
+  private int clientSidePort;
+  private int asListenPort;
   private int clientBufferSize;
   private int asBufferSize;
-
   private int asServerPort;
+  private int keepAlivedPort;
 
   private ConfigurationManager() {
     File file = new File(PROPERTIES_PATH);
@@ -67,13 +69,16 @@ public class ConfigurationManager {
       }
 
     }
+
     initValue();
+
   }
 
   /**
    * Initialize systems
    */
   private void initValue() {
+
     // TODO Auto-generated method stub
     this.asServerAddress = this.getPropertyValueByName("AS_SERVER_ADDRESS");
     this.asServerPort = Integer.parseInt(this.getPropertyValueByName("AS_SERVER_PORT"));
@@ -87,6 +92,9 @@ public class ConfigurationManager {
     this.clientBufferSize = Integer.parseInt(this.getPropertyValueByName("CLIENT_BUFFER_SIZE"));
     this.appstierAddresses = this.getPropertyValueByName("APPSTIER_IP_ADDRESSES");
     this.appstierPort = Integer.parseInt(this.getPropertyValueByName("APPSTIER_PORT"));
+    this.hazelCastIp = this.getPropertyValueByName("HAZELCAST_DISCOVERY_IP");
+    this.hazelCastPort = Integer.parseInt(this.getPropertyValueByName("HAZELCAST_PORT"));
+    this.keepAlivedPort = Integer.parseInt(this.getPropertyValueByName("KEEPALIVED_PORT"));
 
   }
 
@@ -95,9 +103,11 @@ public class ConfigurationManager {
   }
 
   public static ConfigurationManager getInstance() {
+
     if (null == ConfigurationManager.instance)
       instance = new ConfigurationManager();
     return ConfigurationManager.instance;
+
   }
 
   /*
@@ -149,6 +159,14 @@ public class ConfigurationManager {
 
   public int getAppstierPort() {
     return appstierPort;
+  }
+
+  public String getHazelCastIp() {
+    return hazelCastIp;
+  }
+
+  public int getHazelCastPort() {
+    return hazelCastPort;
   }
 
 }

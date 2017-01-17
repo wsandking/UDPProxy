@@ -1,9 +1,7 @@
 package com.genband.infrastracture.server;
 
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -37,6 +35,11 @@ public class PortMappingUDPProxy {
      */
     UDPProxyHazelCastServer.getInstance().initAddressMap();
     this.configManager = ConfigurationManager.getInstance();
+    
+    
+    /**
+     * Before initialize listenning socket, it should wait for keepalived signal
+     */
     clientSideUDPServerInit();
     asideUDPServerInit();
 
@@ -54,12 +57,14 @@ public class PortMappingUDPProxy {
       try {
 
         log.info("Appstier listen ip: " + ip + " listen port: " + port);
-        clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
+        /**
+         * Maybe just involve the port
+         */
+        clientSideSocket = new DatagramSocket(port);
+        // clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
 
       } catch (SocketException e) {
         log.error("Cannot initiate UDP listenning. " + e.getMessage());
-      } catch (UnknownHostException e) {
-        log.error("Cannot listen on ip: " + ip + " reason: " + e.getMessage());
       }
     }
 
@@ -76,12 +81,14 @@ public class PortMappingUDPProxy {
     try {
 
       log.info("AS listen ip: " + ip + " listen port: " + port);
-      asSocket = new DatagramSocket(port, InetAddress.getByName(ip));
+      /**
+       * Maybe just involve the port
+       */
+      asSocket = new DatagramSocket(port);
+      // asSocket = new DatagramSocket(port, InetAddress.getByName(ip));
 
     } catch (SocketException e) {
       log.error("Cannot initiate UDP listenning. ");
-    } catch (UnknownHostException e) {
-      log.error("Cannot listen on ip: " + ip);
     }
 
   }

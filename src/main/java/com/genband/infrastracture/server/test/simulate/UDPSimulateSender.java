@@ -6,6 +6,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Map;
+
+import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
+import com.genband.infrastracture.management.Address;
 
 
 public class UDPSimulateSender {
@@ -109,31 +113,37 @@ public class UDPSimulateSender {
   }
 
   public static void main(String args[]) throws UnknownHostException, InterruptedException {
-//    UDPSimulateSender sender = new UDPSimulateSender();
-//
-    String str = String.join("\n", "REGISTER sip:sidr.dev.genband.com SIP/2.0",
-        "SIP/2.0 200 OK",
-        "Via: SIP/2.0/UDP 172.28.19.60:5090;branch=z9hG4bK-524287-1---b3b3e77b860f4d13;rport",
-        "Max-Forwards: 70",
-        "Contact: \"testagent02\"<sip:testagent01@172.28.19.60:5090;rinstance=94b99f6f8d82633e>",
-        "To: <sip:testagent01@spidr.dev.genband.com>",
-        "From: \"testagent02\"<sip:testagent01@spidr.dev.genband.com>;tag=6b7e7072",
-        "Call-ID: 83108ZDIxOGQ4YmM4NDUxN2FhYTdmYWUzYTUyYmEwZGNmNWQ", "CSeq: 1 REGISTER",
-        "Expires: 3600",
-        "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE",
-        "User-Agent: X-Lite release 4.9.7 stamp 83108", "Content-Length: 0");;
-    System.out.println(str);
-    System.out.println();
-    String address = "172.28.248.8:9102";
-    String newStr = str.replaceAll("Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)",
-        "Contact: <sip:$1@" + address);
+    // UDPSimulateSender sender = new UDPSimulateSender();
+    //
+    // String str = String.join("\n", "REGISTER sip:sidr.dev.genband.com SIP/2.0",
+    // "SIP/2.0 200 OK",
+    // "Via: SIP/2.0/UDP 172.28.19.60:5090;branch=z9hG4bK-524287-1---b3b3e77b860f4d13;rport",
+    // "Max-Forwards: 70",
+    // "Contact: \"testagent02\"<sip:testagent01@172.28.19.60:5090;rinstance=94b99f6f8d82633e>",
+    // "To: <sip:testagent01@spidr.dev.genband.com>",
+    // "From: \"testagent02\"<sip:testagent01@spidr.dev.genband.com>;tag=6b7e7072",
+    // "Call-ID: 83108ZDIxOGQ4YmM4NDUxN2FhYTdmYWUzYTUyYmEwZGNmNWQ", "CSeq: 1 REGISTER",
+    // "Expires: 3600",
+    // "Allow: SUBSCRIBE, NOTIFY, INVITE, ACK, CANCEL, BYE, REFER, INFO, OPTIONS, MESSAGE",
+    // "User-Agent: X-Lite release 4.9.7 stamp 83108", "Content-Length: 0");;
+    // System.out.println(str);
+    // System.out.println();
+    // String address = "172.28.248.8:9102";
+    // String newStr = str.replaceAll("Contact: [\"a-zA-Z0-9\\.\\:
+    // ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)",
+    // "Contact: <sip:$1@" + address);
+    UDPProxyHazelCastServer.getInstance().initAddressMap();
+    Map<String, Address> result =
+        UDPProxyHazelCastServer.getInstance().getHashMap("userIpportMapping");
+    for (String k : result.keySet()) {
+      System.out.println(k + " : " + result.get(k));
+    }
+    // System.out.println(newStr);
+    // System.out.println(newStr.contains("SIP/2.0 200 OK"));
+    // sender.receivePacket();
+    // String a = "T";
+    // System.out.println(a.getBytes().length);
 
-    System.out.println(newStr);
-    System.out.println(newStr.contains("SIP/2.0 200 OK"));
-//    sender.receivePacket();
-//    String a = "T";
-//    System.out.println(a.getBytes().length);
-    
   }
 
 }

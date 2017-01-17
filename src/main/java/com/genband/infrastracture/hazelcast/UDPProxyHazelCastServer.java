@@ -4,8 +4,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.genband.infrastracture.config.ConfigurationManager;
 import com.genband.infrastracture.management.Address;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -20,6 +23,21 @@ public class UDPProxyHazelCastServer {
   private UDPProxyHazelCastServer() {
 
     Config cfg = new Config();
+
+    /**
+     * Enable hazelcast discovery
+     */
+    NetworkConfig network = cfg.getNetworkConfig();
+    network.setPort(ConfigurationManager.getInstance().getHazelCastPort());
+    network.setPortAutoIncrement(true);
+
+    JoinConfig join = network.getJoin();
+    join.getMulticastConfig().setEnabled(false);
+
+    join.getTcpIpConfig().addMember(ConfigurationManager.getInstance().getHazelCastIp())
+        .setEnabled(true);
+    // network.getInterfaces().setEnabled(true).addInterface("172.28.250.*");
+
     this.hazelcastInstance = Hazelcast.newHazelcastInstance(cfg);
     log.info("Initializing Hazelcast... ");
 

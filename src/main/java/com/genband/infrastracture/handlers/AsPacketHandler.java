@@ -8,9 +8,17 @@ import java.net.InetAddress;
 import org.apache.log4j.Logger;
 import com.genband.infrastracture.config.ConfigurationManager;
 
+/**
+ * Do not forward trying
+ * 
+ * @author sewang
+ *
+ */
 public class AsPacketHandler implements PacketHandler {
 
   private static Logger log = Logger.getLogger(AsPacketHandler.class.getName());
+
+  private static final String TRYING = "SIP/2.0 100 Trying";
   private static final String HANDLER_TYPE = "AS Application Handler";
   private static final String UDP_CONTACT =
       "Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
@@ -57,26 +65,36 @@ public class AsPacketHandler implements PacketHandler {
      * 3. use client listening socket to send message
      */
     try {
-      /**
-       * Future may have multiple ip on apps-tier side
-       */
-      String desIp = null;
 
-      if (appstierAddresses.length > 1 && index < appstierAddresses.length && index >= 0) {
+      String content = new String(packet.getData(), 0, packet.getLength());
 
-        synchronized (index) {
+      if (!content.contains(TRYING)) {
+        /**
+         * Future may have multiple ip on apps-tier side
+         */
+        String desIp = null;
 
-          desIp = appstierAddresses[index];
-          if (++index >= appstierAddresses.length)
-            index = 0;
+        if (appstierAddresses.length > 1 && index < appstierAddresses.length && index >= 0) {
 
-        }
+          synchronized (index) {
 
-      } else
-        desIp = appstierAddresses[0];
+            desIp = appstierAddresses[index];
+            if (++index >= appstierAddresses.length)
+              index = 0;
 
-      DatagramPacket dp = this.constructPacket();
-      this.sendPacket(dp, desIp);
+          }
+
+        } else
+          desIp = appstierAddresses[0];
+
+        DatagramPacket dp = this.constructPacket();
+        this.sendPacket(dp, desIp);
+
+      } else {
+
+        log.info("Trying message, filtering out. ");
+
+      }
 
     } catch (IOException e) {
       // TODO Auto-generated catch block
