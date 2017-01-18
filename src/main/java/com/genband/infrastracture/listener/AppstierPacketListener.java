@@ -10,14 +10,14 @@ import com.genband.infrastracture.handlers.AsPacketHandler;
 import com.genband.infrastracture.handlers.TmpSocketHandler;
 import com.genband.infrastracture.management.UDPExecutorPool;
 
-public class ClientPacketListener implements Runnable {
+public class AppstierPacketListener implements Runnable {
 
   private DatagramSocket listener;
   private byte[] buffer;
 
-  private static Logger log = Logger.getLogger(ClientPacketListener.class.getName());
+  private static Logger log = Logger.getLogger(AppstierPacketListener.class.getName());
 
-  public ClientPacketListener(DatagramSocket socket, int bufferSize) {
+  public AppstierPacketListener(DatagramSocket socket, int bufferSize) {
     log.info("UDP Buffer Size: " + bufferSize);
     this.listener = socket;
     buffer = new byte[bufferSize];

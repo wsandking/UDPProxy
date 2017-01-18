@@ -31,8 +31,8 @@ public class TmpSocketHandler implements Runnable {
     bufferSize = ConfigurationManager.getInstance().getAsBufferSize();
     appstierAddresses = ConfigurationManager.getInstance().getAppstierAddresses().split(";");
     appstierPort = ConfigurationManager.getInstance().getAsListenPort();
-    proxyAddress = ConfigurationManager.getInstance().getClientSideIP() + ":"
-        + ConfigurationManager.getInstance().getClientSidePort();
+    proxyAddress = ConfigurationManager.getInstance().getAppestierListenIP() + ":"
+        + ConfigurationManager.getInstance().getAppstierListenPort();
 
   }
 

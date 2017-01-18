@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.genband.infrastracture.handlers.AsPacketHandler;
-import com.genband.infrastracture.handlers.ClientPacketHandler;
+import com.genband.infrastracture.handlers.AppstierPacketHandler;
 import com.genband.infrastracture.handlers.TmpSocketHandler;
 
 /**
@@ -33,7 +33,7 @@ public class UDPExecutorPool {
   private UDPExecutorPool() {
 
     clientHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
-        .setNamePrefix(ClientPacketHandler.getType()).build());
+        .setNamePrefix(AppstierPacketHandler.getType()).build());
     asHandlersPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
         .setNamePrefix(AsPacketHandler.getType()).build());
     tmpSocketListenPool = Executors.newCachedThreadPool(new HandlerThreadFactory().setDaemon(false)
@@ -46,7 +46,7 @@ public class UDPExecutorPool {
     /**
      * May use execute, need to investigate
      */
-    clientHandlersPool.submit(new ClientPacketHandler().processPackets(packet));
+    clientHandlersPool.submit(new AppstierPacketHandler().processPackets(packet));
 
   }
 

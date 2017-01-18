@@ -7,6 +7,7 @@ import java.net.InetAddress;
 
 import org.apache.log4j.Logger;
 import com.genband.infrastracture.config.ConfigurationManager;
+import com.genband.infrastracture.management.SharedConstantValue;
 
 /**
  * Do not forward trying
@@ -18,24 +19,23 @@ public class AsPacketHandler implements PacketHandler {
 
   private static Logger log = Logger.getLogger(AsPacketHandler.class.getName());
 
-  private static final String TRYING = "SIP/2.0 100 Trying";
+
   private static final String HANDLER_TYPE = "AS Application Handler";
-  private static final String UDP_CONTACT =
-      "Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
 
   private static String proxyAddress;
   private static String[] appstierAddresses;
 
   private static Integer appstierPort;
   private static Integer index;
+
   private static DatagramSocket clientSideSocket;
 
   static {
 
     appstierAddresses = ConfigurationManager.getInstance().getAppstierAddresses().split(";");
     appstierPort = ConfigurationManager.getInstance().getAsListenPort();
-    proxyAddress = ConfigurationManager.getInstance().getClientSideIP() + ":"
-        + ConfigurationManager.getInstance().getClientSidePort();
+    proxyAddress = ConfigurationManager.getInstance().getAppestierListenIP() + ":"
+        + ConfigurationManager.getInstance().getAppstierListenPort();
     index = 0;
 
   }
@@ -68,7 +68,7 @@ public class AsPacketHandler implements PacketHandler {
 
       String content = new String(packet.getData(), 0, packet.getLength());
 
-      if (!content.contains(TRYING)) {
+      if (!content.contains(SharedConstantValue.TRYING)) {
         /**
          * Future may have multiple ip on apps-tier side
          */
@@ -128,7 +128,8 @@ public class AsPacketHandler implements PacketHandler {
   private DatagramPacket constructPacket() {
 
     String content = new String(packet.getData(), 0, packet.getLength());
-    String newStr = content.replaceAll(UDP_CONTACT, "Contact: <sip:$1@" + proxyAddress);
+    String newStr =
+        content.replaceAll(SharedConstantValue.UDP_CONTACT, "Contact: <sip:$1@" + proxyAddress);
 
     byte[] newContent = newStr.getBytes();
     DatagramPacket udppack = new DatagramPacket(newContent, newContent.length);

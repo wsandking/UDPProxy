@@ -38,6 +38,13 @@ public class UDPProxyHazelCastServer {
         .setEnabled(true);
     // network.getInterfaces().setEnabled(true).addInterface("172.28.250.*");
 
+    /**
+     * 
+     * We use hazelcast for Hashmap configuration
+     * 
+     **/
+    
+
     this.hazelcastInstance = Hazelcast.newHazelcastInstance(cfg);
     log.info("Initializing Hazelcast... ");
 

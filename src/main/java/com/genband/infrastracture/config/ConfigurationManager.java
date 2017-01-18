@@ -30,15 +30,15 @@ public class ConfigurationManager {
   private String assignableIpAddresses;
   private String portRange;
   private String appstierAddresses;
-  private String clientSideIP;
+  private String appestierListenIP;
   private String asListenAddress;
   private String hazelCastIp;
 
   private int hazelCastPort;
   private int appstierPort;
-  private int clientSidePort;
+  private int appstierListenPort;
   private int asListenPort;
-  private int clientBufferSize;
+  private int appstierListenBufferSize;
   private int asBufferSize;
   private int asServerPort;
   private int keepAlivedPort;
@@ -84,12 +84,13 @@ public class ConfigurationManager {
     this.asServerPort = Integer.parseInt(this.getPropertyValueByName("AS_SERVER_PORT"));
     this.assignableIpAddresses = this.getPropertyValueByName("ASSIGNABLE_IP_ADDRESSES");
     this.portRange = this.getPropertyValueByName("PORT_RANGE");
-    this.clientSidePort = Integer.parseInt(this.getPropertyValueByName("CLIENT_PORT"));
-    this.clientSideIP = this.getPropertyValueByName("CLIENT_SIDE_IP_ADDRESSES");
+    this.appstierListenPort = Integer.parseInt(this.getPropertyValueByName("APPSTIER_LISTEN_PORT"));
+    this.appestierListenIP = this.getPropertyValueByName("APPSTIER_LISTEN_IP_ADDRESSES");
     this.asListenAddress = this.getPropertyValueByName("AS_LISTEN_ADDRESS");
     this.asListenPort = Integer.parseInt(this.getPropertyValueByName("AS_LISTEN_PORT"));
     this.asBufferSize = Integer.parseInt(this.getPropertyValueByName("AS_BUFFER_SIZE"));
-    this.clientBufferSize = Integer.parseInt(this.getPropertyValueByName("CLIENT_BUFFER_SIZE"));
+    this.appstierListenBufferSize =
+        Integer.parseInt(this.getPropertyValueByName("APPSTIER_LISTEN_BUFFER_SIZE"));
     this.appstierAddresses = this.getPropertyValueByName("APPSTIER_IP_ADDRESSES");
     this.appstierPort = Integer.parseInt(this.getPropertyValueByName("APPSTIER_PORT"));
     this.hazelCastIp = this.getPropertyValueByName("HAZELCAST_DISCOVERY_IP");
@@ -129,24 +130,12 @@ public class ConfigurationManager {
     return portRange;
   }
 
-  public int getClientSidePort() {
-    return clientSidePort;
-  }
-
-  public String getClientSideIP() {
-    return clientSideIP;
-  }
-
   public int getAsListenPort() {
     return asListenPort;
   }
 
   public String getAsListenAddress() {
     return asListenAddress;
-  }
-
-  public int getClientBufferSize() {
-    return clientBufferSize;
   }
 
   public int getAsBufferSize() {
@@ -167,6 +156,22 @@ public class ConfigurationManager {
 
   public int getHazelCastPort() {
     return hazelCastPort;
+  }
+
+  public int getKeepAlivedPort() {
+    return keepAlivedPort;
+  }
+
+  public String getAppestierListenIP() {
+    return appestierListenIP;
+  }
+
+  public int getAppstierListenPort() {
+    return appstierListenPort;
+  }
+
+  public int getAppstierListenBufferSize() {
+    return appstierListenBufferSize;
   }
 
 }

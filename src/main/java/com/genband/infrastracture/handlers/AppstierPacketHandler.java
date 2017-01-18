@@ -18,6 +18,7 @@ import com.genband.infrastracture.exception.AddressException;
 import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
 import com.genband.infrastracture.management.Address;
 import com.genband.infrastracture.management.AddressAllocator;
+import com.genband.infrastracture.management.SharedConstantValue;
 import com.genband.infrastracture.management.UDPExecutorPool;
 
 /**
@@ -26,15 +27,10 @@ import com.genband.infrastracture.management.UDPExecutorPool;
  * @author sewang
  *
  */
-public class ClientPacketHandler implements PacketHandler {
+public class AppstierPacketHandler implements PacketHandler {
 
-  private static final String HANDLER_TYPE = "Client Packet Handler";
-  private static final String OK_STATUS_FOR_LOGIN = "SIP/2.0 200 OK";
-  private static final String TRYING = "SIP/2.0 100 Trying";
-  private static final String UDP_USER_FROM =
-      "From: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
-  private static final String UDP_USER_TO =
-      "To: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
+  private static final String HANDLER_TYPE = "Appstier Packet Handler";
+
   private static final String UDP_CONTACT =
       "Contact: [\"a-zA-Z0-9\\.\\: ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)";
 
@@ -44,7 +40,7 @@ public class ClientPacketHandler implements PacketHandler {
    */
   private static Map<String, DatagramSocket> socketPool;
 
-  private static Logger log = Logger.getLogger(ClientPacketHandler.class.getName());
+  private static Logger log = Logger.getLogger(AppstierPacketHandler.class.getName());
   private DatagramPacket packet;
 
   private static String asServerAddress;
@@ -65,15 +61,15 @@ public class ClientPacketHandler implements PacketHandler {
 
     asServerAddress = ConfigurationManager.getInstance().getAsServerAddress();
     asServerPort = ConfigurationManager.getInstance().getAsServerPort();
-    fromUserP = Pattern.compile(UDP_USER_FROM);
-    toUserP = Pattern.compile(UDP_USER_TO);
+    fromUserP = Pattern.compile(SharedConstantValue.UDP_USER_FROM);
+    toUserP = Pattern.compile(SharedConstantValue.UDP_USER_TO);
     socketPool = new HashMap<String, DatagramSocket>();
 
   }
 
 
   @Override
-  public ClientPacketHandler processPackets(DatagramPacket packet) {
+  public AppstierPacketHandler processPackets(DatagramPacket packet) {
     // TODO Auto-generated method stub
     this.packet = packet;
     return this;
@@ -95,7 +91,7 @@ public class ClientPacketHandler implements PacketHandler {
       /**
        * Check if message is trying, if it is trying do not send anything.
        */
-      if (!content.contains(TRYING)) {
+      if (!content.contains(SharedConstantValue.TRYING)) {
         fromPatternMap = fromUserP.matcher(content);
 
         String fromUsername = null;
@@ -175,7 +171,7 @@ public class ClientPacketHandler implements PacketHandler {
      */
     boolean result = false;
 
-    if (content.contains(OK_STATUS_FOR_LOGIN)) {
+    if (content.contains(SharedConstantValue.OK_STATUS_FOR_LOGIN)) {
       log.info("***********Login successful, Socket should be close ***************");
       result = true;
     }
