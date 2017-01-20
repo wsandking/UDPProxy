@@ -1,2 +1,2 @@
 #!/bin/sh
-echo "HEART_BEAT" > /dev/tcp/localhost/8999
+echo "stop" > /dev/tcp/localhost/8989

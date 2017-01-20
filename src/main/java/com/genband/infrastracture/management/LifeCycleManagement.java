@@ -1,13 +1,16 @@
 package com.genband.infrastracture.management;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 
 import org.apache.log4j.Logger;
 
 import com.genband.infrastracture.config.ConfigurationManager;
+import com.genband.infrastracture.handlers.ManagementHandler;
 import com.genband.infrastracture.listener.AppstierPacketListener;
 import com.genband.infrastracture.listener.AsPacketListener;
 
@@ -32,10 +35,19 @@ public class LifeCycleManagement {
   private static LifeCycleManagement instance;
 
   private ConfigurationManager configManager;
+
   private Thread appstierListenThread;
   private Thread asListenThread;
-  private DatagramSocket clientSideSocket;
+
+  private DatagramSocket appstierSocket;
   private DatagramSocket asSocket;
+
+  private ServerSocket managementSocket;
+
+  private AsPacketListener asListener;
+  private AppstierPacketListener appstierListener;
+
+
 
   public static LifeCycleManagement getInstance() {
 
@@ -49,18 +61,10 @@ public class LifeCycleManagement {
 
   private LifeCycleManagement() {
 
+    configManager = ConfigurationManager.getInstance();
     /**
      * Something to initialize here
      */
-    try {
-
-      ServerSocket welcomeSocket = new ServerSocket(6789);
-
-    } catch (IOException e) {
-
-      log.error("Couldn't initialize listening port");
-
-    }
 
   }
 
@@ -70,18 +74,48 @@ public class LifeCycleManagement {
      * Start management tcp port to listenning
      */
 
+    try {
+
+      managementSocket = new ServerSocket(configManager.getKeepAlivedPort());
+
+      while (true) {
+
+        Socket connectionSocket = managementSocket.accept();
+        new Thread(new ManagementHandler(connectionSocket)).start();
+
+      }
+
+    } catch (IOException e) {
+
+      log.error("Couldn't initialize listening port");
+      e.printStackTrace();
+
+    }
 
   }
+
 
   public void stopServer() {
 
+    log.info("Shutting down server...");
 
+    this.stopListener();
+
+    if (asSocket != null && !asSocket.isClosed())
+      this.asSocket.close();
+
+    if (appstierSocket != null && !appstierSocket.isClosed())
+      this.appstierSocket.close();
+
+    asListenThread.interrupt();
+    appstierListenThread.interrupt();
 
   }
 
-  public void heartBeat() {
+  public void heartBeat(PrintWriter writer) throws IOException {
 
-
+    writer.println("Server is ok... ");
+    writer.flush();
 
   }
 
@@ -94,19 +128,28 @@ public class LifeCycleManagement {
 
   public void runServer() {
 
-    appstierUDPServerInit();
-    asideUDPServerInit();
+    init();
 
-    asListenThread = new Thread(new AsPacketListener(this.asSocket, this.clientSideSocket,
-        this.configManager.getAsBufferSize()));
-    appstierListenThread = new Thread(new AppstierPacketListener(this.clientSideSocket,
-        this.configManager.getAppstierListenBufferSize()));
+    asListener = new AsPacketListener(this.asSocket, this.appstierSocket,
+        this.configManager.getAsBufferSize());
+    appstierListener = new AppstierPacketListener(this.appstierSocket,
+        this.configManager.getAppstierListenBufferSize());
+
+    asListenThread = new Thread(asListener);
+    appstierListenThread = new Thread(appstierListener);
 
     asListenThread.start();
     appstierListenThread.start();
 
   }
 
+  public void stopListener() {
+
+
+    asListener.closeListener();
+    appstierListener.closeListener();
+
+  }
 
 
   public void appstierUDPServerInit() {
@@ -124,7 +167,7 @@ public class LifeCycleManagement {
         /**
          * Maybe just involve the port
          */
-        clientSideSocket = new DatagramSocket(port);
+        appstierSocket = new DatagramSocket(port);
         // clientSideSocket = new DatagramSocket(port, InetAddress.getByName(ip));
 
       } catch (SocketException e) {

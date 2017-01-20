@@ -14,20 +14,27 @@ public class AppstierPacketListener implements Runnable {
 
   private DatagramSocket listener;
   private byte[] buffer;
+  private boolean running = false;
 
   private static Logger log = Logger.getLogger(AppstierPacketListener.class.getName());
 
   public AppstierPacketListener(DatagramSocket socket, int bufferSize) {
+
     log.info("UDP Buffer Size: " + bufferSize);
     this.listener = socket;
     buffer = new byte[bufferSize];
+    this.running = true;
 
+  }
+
+  public void closeListener() {
+    this.running = false;
   }
 
   @Override
   public void run() {
 
-    while (true) {
+    while (running) {
 
       try {
 

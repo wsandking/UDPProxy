@@ -14,6 +14,7 @@ public class AsPacketListener implements Runnable {
 
   private DatagramSocket listener;
   private byte[] buffer;
+  private boolean running = false;
 
   private static Logger log = Logger.getLogger(AsPacketListener.class.getName());
 
@@ -24,13 +25,19 @@ public class AsPacketListener implements Runnable {
     buffer = new byte[bufferSize];
     AsPacketHandler.setSenderSocket(sender);
     TmpSocketHandler.setAppsTierSocket(sender);
+    this.running = true;
 
   }
+
+  public void closeListener() {
+    this.running = false;
+  }
+
 
   @Override
   public void run() {
 
-    while (true) {
+    while (running) {
 
       try {
 

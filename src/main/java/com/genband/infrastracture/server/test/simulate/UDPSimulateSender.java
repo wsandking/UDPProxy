@@ -1,16 +1,17 @@
 package com.genband.infrastracture.server.test.simulate;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Map;
-
-import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
-import com.genband.infrastracture.management.Address;
-
 
 public class UDPSimulateSender {
 
@@ -132,17 +133,50 @@ public class UDPSimulateSender {
     // String newStr = str.replaceAll("Contact: [\"a-zA-Z0-9\\.\\:
     // ]*<sip:([a-zA-Z0-9\\.\\:]+)@([a-zA-Z0-9\\.\\:]+)",
     // "Contact: <sip:$1@" + address);
-    UDPProxyHazelCastServer.getInstance().initAddressMap();
-    Map<String, Address> result =
-        UDPProxyHazelCastServer.getInstance().getHashMap("userIpportMapping");
-    for (String k : result.keySet()) {
-      System.out.println(k + " : " + result.get(k));
-    }
+
+    // UDPProxyHazelCastServer.getInstance().initAddressMap();
+    // Map<String, Address> result =
+    // UDPProxyHazelCastServer.getInstance().getHashMap("userIpportMapping");
+    // for (String k : result.keySet()) {
+    // System.out.println(k + " : " + result.get(k));
+    // }
+
     // System.out.println(newStr);
     // System.out.println(newStr.contains("SIP/2.0 200 OK"));
     // sender.receivePacket();
     // String a = "T";
     // System.out.println(a.getBytes().length);
+
+    try {
+      String sentence;
+      String modifiedSentence;
+
+      PrintWriter writer;
+      BufferedReader reader;
+
+      Socket clientSocket = new Socket("172.28.250.11", 8989);
+      writer = new PrintWriter(clientSocket.getOutputStream());
+      reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+      writer.println("heartbeat");
+      writer.flush();
+
+      // writer.close();
+
+      String message = null;
+
+      message = reader.readLine();
+      System.out.println("Message Recieved: " + message + " hahaha");
+
+      reader.close();
+
+      clientSocket.close();
+
+
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
   }
 

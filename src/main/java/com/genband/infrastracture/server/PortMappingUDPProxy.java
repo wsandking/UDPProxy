@@ -3,7 +3,6 @@ package com.genband.infrastracture.server;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import com.genband.infrastracture.config.ConfigurationManager;
 import com.genband.infrastracture.hazelcast.UDPProxyHazelCastServer;
 import com.genband.infrastracture.management.LifeCycleManagement;
 

@@ -1,0 +1,39 @@
+! Configuration File for keepalived
+
+global_defs {
+   notification_email {
+     acassen@firewall.loc
+     failover@firewall.loc
+     sysadmin@firewall.loc
+   }
+ 
+   smtp_connect_timeout 30
+   router_id LVS_DEVEL
+}
+
+vrrp_script chk_myscript {
+  script       "/opt/udpmapper/managment-scripts/heartbeat.sh"
+  interval 2   # check every 2 seconds
+  fall 2       # require 2 failures for KO
+  rise 2       # require 2 successes for OK
+}
+
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface eth0
+    virtual_router_id 51
+    notify /opt/udpmapper/managment-scripts/notify.sh
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        172.28.250.8
+    }
+    track_script {
+        chk_myscript
+    }
+}

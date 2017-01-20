@@ -1,2 +1,2 @@
 #!/bin/sh
-echo "HEART_BEAT" > /dev/tcp/localhost/8999
+java -jar /opt/udpmapper/UDPPortMapper-jar-with-dependencies.jar & (sleep 20;echo "start" > /dev/tcp/localhost/8989)
